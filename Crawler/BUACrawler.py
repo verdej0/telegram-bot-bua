@@ -89,12 +89,12 @@ class BUACrawler:
             numPages = pagesIndex[1]/20 + 1
         return [books, numPages, pagesIndex]
 
-    def nextPageOfCatalog(self):
+    def nextPageOfCatalog(self, indexPagination):
         booksData = []
         action = self.__getActionOfForm(nameHitlistForm)
         self.__currentUrl = urlBase + action
-        payload = {'first_hit': self.__bookSearchPages[0],
-                    'last_hit': self.__bookSearchPages[1],
+        payload = {'first_hit': indexPagination[0],
+                    'last_hit': indexPagination[1],
                     'form_type': 'SCROLL^F'}
         response = requests.post(self.__currentUrl, data=payload,
                 headers=header)
@@ -103,12 +103,12 @@ class BUACrawler:
 
         return booksData
 
-    def lastPageOfCatalog(self):
+    def lastPageOfCatalog(self, indexPagination):
         booksData = []
         action = self.__getActionOfForm(nameHitlistForm)
         self.__currentUrl = urlBase + action
-        payload = {'first_hit': self.__bookSearchPages[0],
-                    'last_hit': self.__bookSearchPages[1],
+        payload = {'first_hit': indexPagination[0],
+                    'last_hit': indexPagination[1],
                     'form_type': 'SCROLL^B'}
         response = requests.post(self.__currentUrl, data=payload,
                 headers=header)

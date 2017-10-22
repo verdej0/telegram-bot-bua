@@ -12,14 +12,9 @@ class BUACatalog:
 
     def clean(self):
         self.books = []
-        self.page = 1
+        self.page = 0
         self.pageIndexs = []
-
-    def setPageIndexs(self, pageIndexs):
-        self.pageIndexs = pageIndexs
-
-    def setPage(self, page):
-        self.page = page
+        self.numPages = 0
 
     def setBooks(self, dataBooks):
         for book in dataBooks:

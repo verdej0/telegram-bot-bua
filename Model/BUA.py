@@ -11,36 +11,38 @@ from BUAService import BUAService
 from BUALoanBooks import BUALoanBooks
 from BUACatalog import BUACatalog
 from LoginException import InvalidCredentialsException, UnloggedUserException, AlreadyLoggedUserException
+from CatalogException import NoSearchException, OnlyOnePageException
 
 
 class BUA:
 
     def __init__(self):
-        self.bua = BUAService()
+        self.service = BUAService()
         self.catalog = BUACatalog()
-        self.loansBooks = BUALoanBooks()
+        self.__loansBooks = BUALoanBooks()
 
-        self.isOnCatalog = False
+        self.__isOnCatalog = False
         self.isLogged = False
-        self.isRenovatingBooks = False
+        self.__isRenovatingBooks = False
 
     def login(self, user, secret):
         if not self.isLogged:
-            self.isLogged = self.bua.login(user, secret)
+            self.isLogged = self.service.login(user, secret)
             if not self.isLogged:
                 raise InvalidCredentialsException()
         else:
             raise AlreadyLoggedUserException()
 
     def showLoans(self):
-        self.isOnCatalog = False
-        self.loansBooks.clean()
+        self.__isOnCatalog = False
+        self.catalog.clean()
+        self.__loansBooks.clean()
         if not self.isLogged:
             raise UnloggedUserException()
 
-        self.isRenovatingBooks = True
-        self.loansBooks.setBooks(self.bua.showLoans())
-        return self.loansBooks.books
+        self.__isRenovatingBooks = True
+        self.__loansBooks.setBooks(self.service.showLoans())
+        return self.__loansBooks.books
 
     def loanSelectedBooks(self, selectedBooks):
 
@@ -61,17 +63,35 @@ class BUA:
         print 'loanAllBooks'
 
     def searchBook(self, name):
-        self.isRenovatingBooks = False
-        books = self.bua.searchBooks(name)
-        self.isOnCatalog = True
-        return books
+        self.catalog.clean()
+        self.__loansBooks.clean()
+        self.__isRenovatingBooks = False
+        dataForBookSearched = self.service.searchBooks(name)
+        self.catalog.setBooks(dataForBookSearched[0])
+        self.catalog.page = 1
+        self.catalog.numPages = dataForBookSearched[1]
+        self.catalog.pageIndexs = dataForBookSearched[2]
+        self.__isOnCatalog = True
+        return self.catalog.books
 
     def nextPage(self):
-        if not self.isOnCatalog:
-            print 'You need to seach a book before do that'
+        if not self.__isOnCatalog:
+            raise NoSearchException()
+        
+        if self.catalog.numPages==1:
+            raise OnlyOnePageException()
 
-        print 'nextPage'
+        self.catalog.setBooks(self.service.nextPageOfCatalog())
+        return self.catalog.books
+        
 
     def lastPage(self):
-        if not self.isOnCatalog:
-            print 'You need to seach a book before do that'
+
+        if not self.__isOnCatalog:
+            raise NoSearchException()
+
+        if self.catalog.numPages==1:
+            raise OnlyOnePageException()
+        
+        self.catalog.setBooks(self.service.lastPageOfCatalog())    
+        return self.catalog.books

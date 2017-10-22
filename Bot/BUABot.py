@@ -9,6 +9,7 @@ sys.path.append("Model/")
 
 from BUA import BUA
 from LoginException import InvalidCredentialsException, UnloggedUserException, AlreadyLoggedUserException
+from CatalogException import NoSearchException, OnlyOnePageException
 
 
 ##TODO: Add timeout for disconnect, for example, 15min...
@@ -34,6 +35,24 @@ class BUABot:
         except UnloggedUserException:
             print 'UnloggedUserException'
 
+    def searchBook(self, name):
+            self.bua.searchBook(name)
+
+    def nextPage(self):
+        try:
+            self.bua.nextPage()
+        except NoSearchException:
+            print 'NoSearchException'
+        except OnlyOnePageException:
+            print 'OnlyOnePageException'
+
+    def lastPage(self):
+        try:
+            self.bua.lastPage()
+        except NoSearchException:
+            print 'NoSearchException'
+        except OnlyOnePageException:
+            print 'OnlyOnePageException'
 
     def loanSelectedBooks(self, selectedBooks):
         ##Check if the indexs of selected books are correct

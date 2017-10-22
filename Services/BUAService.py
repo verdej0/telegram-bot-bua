@@ -12,9 +12,9 @@ import Utils
 from bs4 import BeautifulSoup as bs
 
 header = {'content-type': 'application/x-www-form-urlencoded'}
-searchFormName = 'searchform'
-newSessionFormName = 'loginform'
-hitlistFormName = 'hitlist'
+nameSearchForm = 'searchform'
+nameNewSessionForm = 'loginform'
+nameHitlistForm = 'hitlist'
 urlBase = 'http://gaudi.ua.es'
 firstAction = '/uhtbin/cgisirsi/x/x/0/49/'
 
@@ -24,7 +24,6 @@ class BUAService:
     def __init__(self):
         urlBua = urlBase + firstAction
         self.currentPage = requests.get(urlBua).content
-        self.__bookSearchPages = [] ##TODO: Remove this
         self.__urlScrapped = None
         self.__currentUrl = ''
         self.__isLogged = False
@@ -42,22 +41,39 @@ class BUAService:
     def __catalogLastPageIndex(self):
         self.__urlScrapped = bs(self.currentPage, 'html.parser')
         setOfP = self.__urlScrapped.find_all('p', {'class': 'searchsum'})
-        self.__bookSearchPages = []
+        bookSearchPages = []
         for p in setOfP:
             if 'href' in str(p):
                 pages = p.find_all('a')
                 if len(pages) == 3:
-                    self.__bookSearchPages = [1, 20]
+                    bookSearchPages = [1, 20]
                 else:
                     last = (len(pages) - 2) * 20
-                    self.__bookSearchPages = [last - 19, last]
+                    bookSearchPages = [last - 19, last]
                 break
+
+        return bookSearchPages
 
     def searchBooks(self, bookName):
 
-        # # TODO: before do the next code go to rootbarcell Catalog.
+        ## Go to catalog menu section
+        books = []
+        self.__urlScrapped = bs(self.currentPage, 'html.parser')
+        setOfTd = self.__urlScrapped.find_all('td', {'class': 'rootbarcell'})
+        action = ''
+        for td in setOfTd:
+            if 'href' in str(td):
+                pages = td.find_all('a')
+                action = pages[0].attrs.get('href')
+                break
 
-        action = self.__getActionOfForm(searchFormName)
+        if action == '':
+            return books
+
+        self.__currentUrl = urlBase + action
+        self.currentPage = requests.get(self.__currentUrl).content
+
+        action = self.__getActionOfForm(nameSearchForm)
         self.__currentUrl = urlBase + action
         payload = {
             'query_type': 'search',
@@ -66,15 +82,18 @@ class BUAService:
             'library': '',
             'sort_by': 'TI',
             }
-        response = requests.post(self.__currentUrl, data=payload,
-                                 headers=header)
+        response = requests.post(self.__currentUrl, data=payload, headers=header)
         self.currentPage = response.content
-        self.__catalogLastPageIndex()
+        pagesIndex = self.__catalogLastPageIndex()
+        numPages = 1
+        if len(pagesIndex) == 2:
+            numPages = pagesIndex[1]/20 + 1
+        return [books, numPages, pagesIndex]
 
     def nextPageOfCatalog(self):
         booksData = []
         if self.__bookSearchPages != []:
-            action = self.__getActionOfForm(hitlistFormName)
+            action = self.__getActionOfForm(nameHitlistForm)
             self.__currentUrl = urlBase + action
             payload = {'first_hit': self.__bookSearchPages[0],
                        'last_hit': self.__bookSearchPages[1],
@@ -83,14 +102,15 @@ class BUAService:
                     headers=header)
             self.currentPage = response.content
 
-            # #booksData = extractBooks()
+            ##TODO #booksData = extractBooksOfCurrentPage()
+            booksData = []
 
         return booksData
 
     def lastPageOfCatalog(self):
         booksData = []
         if self.__bookSearchPages != []:
-            action = self.__getActionOfForm(hitlistFormName)
+            action = self.__getActionOfForm(nameHitlistForm)
             self.__currentUrl = urlBase + action
             payload = {'first_hit': self.__bookSearchPages[0],
                        'last_hit': self.__bookSearchPages[1],
@@ -98,15 +118,15 @@ class BUAService:
             response = requests.post(self.__currentUrl, data=payload,
                     headers=header)
             self.currentPage = response.content
-
-            # #booksData = extractBooks()
+            
+            ##TODO #booksData = extractBooksOfCurrentPage()
+            booksData = []
 
         return booksData
 
     def showLoans(self):
 
         # This enters in link 'Servios al usuario'
-
         books = []
         self.__urlScrapped = bs(self.currentPage, 'html.parser')
         setOfTd = self.__urlScrapped.find_all('td', {'class': 'rootbarcell'})
@@ -124,7 +144,6 @@ class BUAService:
         self.currentPage = requests.get(self.__currentUrl).content
 
         # This enters in link 'Renovar Prestamos'
-
         self.__urlScrapped = bs(self.currentPage, 'html.parser')
         tables = self.__urlScrapped.find_all('table',
                 {'class': 'defaultstyle'})
@@ -137,9 +156,7 @@ class BUAService:
         self.currentPage = requests.get(self.__currentUrl).content
 
         # Now, we're on loan page
-
-        # #TODO: Remove this line
-
+        ##DELETE: Remove this line for production
         self.currentPage = Utils.testPage
         matches = re.finditer(Utils.regex, self.currentPage)
         for match in matches:
@@ -148,25 +165,21 @@ class BUAService:
         return books
 
     def loanSelectedBook(self):
-
-        # #TODO
-
+        ##TODO
         pass
 
     def loanAllBooks(self):
-
-        # #TODO
-
+        ##TODO
         pass
 
     def login(self, user, secret):
-        action = self.__getActionOfForm(newSessionFormName)
+        action = self.__getActionOfForm(nameNewSessionForm)
         self.__currentUrl = urlBase + action
         payload = {'user_id': user, 'password': secret}
         response = requests.post(self.__currentUrl, data=payload, headers=header)
         self.currentPage = response.content
 
-        # # TODO: Check if login is failed return False
+        ##TODO: Check if login is failed return False
         # if response.status == 200:
         #   self.isLogged = True
 

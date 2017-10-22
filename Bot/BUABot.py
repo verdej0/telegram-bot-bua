@@ -24,8 +24,6 @@ class BUABot:
             print 'Login sucessful'
         except InvalidCredentialsException:
             print 'InvalidCredentialsException'
-        except UnloggedUserException:
-            print 'UnloggedUserException'
         except AlreadyLoggedUserException:
             print 'AlreadyLoggedUserException'
 

@@ -9,7 +9,7 @@
 - Desconectarse
 - Ver libros para renovar
 
-##TODO:
+## TODO:
 
 - Extraer array [[titulo,autor], [titulo,autor], …] de libros buscados
 - Post para reservar libros seleccionados

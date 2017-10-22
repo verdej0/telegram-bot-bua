@@ -29,18 +29,27 @@ class BUABot:
         except AlreadyLoggedUserException:
             print 'AlreadyLoggedUserException'
 
+    def disconnect(self):
+        try:
+            self.bua.disconnect()
+            print 'Disconnect sucessful'
+        except UnloggedUserException:
+            print 'UnloggedUserException'
+
     def showLoans(self):
         try:
-            books = self.bua.showLoans()
+            print self.bua.showLoans()
         except UnloggedUserException:
             print 'UnloggedUserException'
 
     def searchBook(self, name):
-            self.bua.searchBook(name)
+            books = self.bua.searchBook(name)
+            print books
+
 
     def nextPage(self):
         try:
-            self.bua.nextPage()
+            print self.bua.nextPage()
         except NoSearchException:
             print 'NoSearchException'
         except OnlyOnePageException:
@@ -48,7 +57,7 @@ class BUABot:
 
     def lastPage(self):
         try:
-            self.bua.lastPage()
+            print self.bua.lastPage()
         except NoSearchException:
             print 'NoSearchException'
         except OnlyOnePageException:
@@ -57,13 +66,13 @@ class BUABot:
     def loanSelectedBooks(self, selectedBooks):
         ##Check if the indexs of selected books are correct
         try:
-            self.bua.loanSelectedBooks(selectedBooks)
+            print self.bua.loanSelectedBooks(selectedBooks)
         except UnloggedUserException:
             print 'UnloggedUserException'
 
     def loanAllBooks(self):
 
         try:
-            self.bua.loanAllBooks()
+            print self.bua.loanAllBooks()
         except UnloggedUserException:
             print 'UnloggedUserException'

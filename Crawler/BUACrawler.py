@@ -19,7 +19,7 @@ urlBase = 'http://gaudi.ua.es'
 firstAction = '/uhtbin/cgisirsi/x/x/0/49/'
 
 
-class BUAService:
+class BUACrawler:
 
     def __init__(self):
         urlBua = urlBase + firstAction
@@ -63,8 +63,7 @@ class BUAService:
         action = ''
         for td in setOfTd:
             if 'href' in str(td):
-                pages = td.find_all('a')
-                action = pages[0].attrs.get('href')
+                action = td.find_all('a')[0].attrs.get('href')
                 break
 
         if action == '':
@@ -92,36 +91,30 @@ class BUAService:
 
     def nextPageOfCatalog(self):
         booksData = []
-        if self.__bookSearchPages != []:
-            action = self.__getActionOfForm(nameHitlistForm)
-            self.__currentUrl = urlBase + action
-            payload = {'first_hit': self.__bookSearchPages[0],
-                       'last_hit': self.__bookSearchPages[1],
-                       'form_type': 'SCROLL^F'}
-            response = requests.post(self.__currentUrl, data=payload,
-                    headers=header)
-            self.currentPage = response.content
-
-            ##TODO #booksData = extractBooksOfCurrentPage()
-            booksData = []
+        action = self.__getActionOfForm(nameHitlistForm)
+        self.__currentUrl = urlBase + action
+        payload = {'first_hit': self.__bookSearchPages[0],
+                    'last_hit': self.__bookSearchPages[1],
+                    'form_type': 'SCROLL^F'}
+        response = requests.post(self.__currentUrl, data=payload,
+                headers=header)
+        self.currentPage = response.content
+        ##TODO #booksData = extractBooksOfCurrentPage()
 
         return booksData
 
     def lastPageOfCatalog(self):
         booksData = []
-        if self.__bookSearchPages != []:
-            action = self.__getActionOfForm(nameHitlistForm)
-            self.__currentUrl = urlBase + action
-            payload = {'first_hit': self.__bookSearchPages[0],
-                       'last_hit': self.__bookSearchPages[1],
-                       'form_type': 'SCROLL^B'}
-            response = requests.post(self.__currentUrl, data=payload,
-                    headers=header)
-            self.currentPage = response.content
-            
-            ##TODO #booksData = extractBooksOfCurrentPage()
-            booksData = []
-
+        action = self.__getActionOfForm(nameHitlistForm)
+        self.__currentUrl = urlBase + action
+        payload = {'first_hit': self.__bookSearchPages[0],
+                    'last_hit': self.__bookSearchPages[1],
+                    'form_type': 'SCROLL^B'}
+        response = requests.post(self.__currentUrl, data=payload,
+                headers=header)
+        self.currentPage = response.content
+        
+        ##TODO #booksData = extractBooksOfCurrentPage()
         return booksData
 
     def showLoans(self):
@@ -133,8 +126,7 @@ class BUAService:
         action = ''
         for td in setOfTd:
             if 'href' in str(td):
-                pages = td.find_all('a')
-                action = pages[-2].attrs.get('href')
+                action = td.find_all('a')[-2].attrs.get('href')
                 break
 
         if action == '':
@@ -184,3 +176,15 @@ class BUAService:
         #   self.isLogged = True
 
         return True
+
+    def disconnect(self):
+        self.__urlScrapped = bs(self.currentPage, 'html.parser')
+        tables = self.__urlScrapped.find_all('table', {'class': 'gatewaystyle'})
+        action = tables[0].find_all('a')[-1].attrs.get('href')
+        self.__currentUrl = urlBase + action
+        self.currentPage = requests.post(self.__currentUrl).content
+        
+        self.__isLogged = False
+        self.__urlScrapped = None
+        self.__currentUrl = urlBase + firstAction
+        self.currentPage = requests.get(self.__currentUrl).content

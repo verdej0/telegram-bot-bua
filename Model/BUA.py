@@ -4,10 +4,10 @@
 ##TODO: Improve the next two lines
 
 import sys
-sys.path.append('Services/')
+sys.path.append('Crawler/')
 sys.path.append('Model/Exceptions/')
 
-from BUAService import BUAService
+from BUACrawler import BUACrawler
 from BUALoanBooks import BUALoanBooks
 from BUACatalog import BUACatalog
 from LoginException import InvalidCredentialsException, UnloggedUserException, AlreadyLoggedUserException
@@ -17,7 +17,7 @@ from CatalogException import NoSearchException, OnlyOnePageException
 class BUA:
 
     def __init__(self):
-        self.service = BUAService()
+        self.crawler = BUACrawler()
         self.catalog = BUACatalog()
         self.__loansBooks = BUALoanBooks()
 
@@ -27,11 +27,21 @@ class BUA:
 
     def login(self, user, secret):
         if not self.isLogged:
-            self.isLogged = self.service.login(user, secret)
+            self.isLogged = self.crawler.login(user, secret)
             if not self.isLogged:
                 raise InvalidCredentialsException()
         else:
             raise AlreadyLoggedUserException()
+
+    def disconnect(self):
+        if not self.isLogged:
+            raise UnloggedUserException()
+
+        self.crawler.disconnect()    
+        self.isLogged = True
+        self.__isOnCatalog = False
+        self.__isRenovatingBooks = False
+    
 
     def showLoans(self):
         self.__isOnCatalog = False
@@ -41,7 +51,7 @@ class BUA:
             raise UnloggedUserException()
 
         self.__isRenovatingBooks = True
-        self.__loansBooks.setBooks(self.service.showLoans())
+        self.__loansBooks.setBooks(self.crawler.showLoans())
         return self.__loansBooks.books
 
     def loanSelectedBooks(self, selectedBooks):
@@ -66,7 +76,7 @@ class BUA:
         self.catalog.clean()
         self.__loansBooks.clean()
         self.__isRenovatingBooks = False
-        dataForBookSearched = self.service.searchBooks(name)
+        dataForBookSearched = self.crawler.searchBooks(name)
         self.catalog.setBooks(dataForBookSearched[0])
         self.catalog.page = 1
         self.catalog.numPages = dataForBookSearched[1]
@@ -81,7 +91,7 @@ class BUA:
         if self.catalog.numPages==1:
             raise OnlyOnePageException()
 
-        self.catalog.setBooks(self.service.nextPageOfCatalog())
+        self.catalog.setBooks(self.crawler.nextPageOfCatalog())
         return self.catalog.books
         
 
@@ -93,5 +103,5 @@ class BUA:
         if self.catalog.numPages==1:
             raise OnlyOnePageException()
         
-        self.catalog.setBooks(self.service.lastPageOfCatalog())    
+        self.catalog.setBooks(self.crawler.lastPageOfCatalog())    
         return self.catalog.books

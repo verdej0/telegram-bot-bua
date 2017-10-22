@@ -48,13 +48,3 @@ class BUABot:
             self.bua.loanAllBooks()
         except UnloggedUserException:
             print 'UnloggedUserException'
-
-
-        
-
-    
-
-
-buaBot = BUABot()
-buaBot.login('0XXXXXXXX', 'YYYY')
-buaBot.showLoans()

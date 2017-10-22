@@ -1,18 +1,20 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-
 ##TODO: Improve the next two lines
 import sys
 sys.path.append("Bot/")
 
+##TODO: Change the content of these variables by yours BUA credials. Only for testing. Remember to erase it when you push a change in the repo.
+username = '0XXXXXXXX'
+secret = 'YYYY'
 
-#from Bot import BUABot
- 
+from Bot import BUABot
+
 
 def main():
     buaBot = BUABot()
-    buaBot.login('0XXXXXXXX', 'YYYY')
+    buaBot.login(username, secret) 
     buaBot.showLoans()
 
 

@@ -4,7 +4,7 @@
 ##TODO: Improve the next two lines
 
 import sys
-sys.path.append('../Common/')
+sys.path.append('Common/')
 
 import requests
 import re

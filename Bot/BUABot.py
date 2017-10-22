@@ -4,14 +4,14 @@
 
 ##TODO: Improve the next two lines
 import sys
-sys.path.append("../Model/")
-sys.path.append("../Model/Exceptions/")
+sys.path.append("Model/")
 
 
 from BUA import BUA
 from LoginException import InvalidCredentialsException, UnloggedUserException, AlreadyLoggedUserException
 
 
+##TODO: Add timeout for disconnect, for example, 15min...
 class BUABot:
 
     def __init__(self):

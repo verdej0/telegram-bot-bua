@@ -4,8 +4,8 @@
 ##TODO: Improve the next two lines
 
 import sys
-sys.path.append('../Services/')
-sys.path.append('Exceptions/')
+sys.path.append('Services/')
+sys.path.append('Model/Exceptions/')
 
 from BUAService import BUAService
 from BUALoanBooks import BUALoanBooks

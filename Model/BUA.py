@@ -91,7 +91,10 @@ class BUA:
         if self.catalog.numPages==1:
             raise OnlyOnePageException()
 
-        self.catalog.setBooks(self.crawler.nextPageOfCatalog(self.catalog.pageIndexs))
+        if self.catalog.page < self.catalog.numPages:
+            self.catalog.page += 1
+            self.catalog.setBooks(self.crawler.nextPageOfCatalog(self.catalog.pageIndexs))
+
         return self.catalog.books
         
 
@@ -103,5 +106,7 @@ class BUA:
         if self.catalog.numPages==1:
             raise OnlyOnePageException()
         
-        self.catalog.setBooks(self.crawler.lastPageOfCatalog(self.catalog.pageIndexs))    
+        if self.catalog.page > 1:
+            self.catalog.page -= 1
+            self.catalog.setBooks(self.crawler.nextPageOfCatalog(self.catalog.pageIndexs))
         return self.catalog.books

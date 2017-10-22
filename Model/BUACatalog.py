@@ -17,5 +17,6 @@ class BUACatalog:
         self.numPages = 0
 
     def setBooks(self, dataBooks):
+        self.books = []
         for book in dataBooks:
             self.books.append(Book(book))

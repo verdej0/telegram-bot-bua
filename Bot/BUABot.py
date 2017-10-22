@@ -44,12 +44,16 @@ class BUABot:
 
     def searchBook(self, name):
             books = self.bua.searchBook(name)
-            print books
+            if len(books)==0:
+                print 'No books found'
+            else:
+                print books
 
 
     def nextPage(self):
         try:
-            print self.bua.nextPage()
+            books = self.bua.nextPage()
+            print books
         except NoSearchException:
             print 'NoSearchException'
         except OnlyOnePageException:
@@ -57,7 +61,8 @@ class BUABot:
 
     def lastPage(self):
         try:
-            print self.bua.lastPage()
+            books = self.bua.lastPage()
+            print books
         except NoSearchException:
             print 'NoSearchException'
         except OnlyOnePageException:

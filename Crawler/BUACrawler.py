@@ -54,6 +54,26 @@ class BUACrawler:
 
         return bookSearchPages
 
+    def __extractBooksOfCurrentPage(self):
+        self.__urlScrapped = bs(self.currentPage, 'html.parser')
+        setOfTables = self.__urlScrapped.find_all('td', {'class': 'searchsum'})
+        
+        books = []
+
+        if len(setOfTables)==0:
+            return books
+
+        items = setOfTables[0].find_all('table')
+        
+        for i in range(1, len(items)-1):
+            label = items[i].find_all('td')[4].find_all('label')
+            matches = re.finditer(Utils.catalogBookRegex, str(label))
+            for match in matches:
+                books.append(match.groups())   
+
+        return books
+        
+
     def searchBooks(self, bookName):
 
         ## Go to catalog menu section
@@ -84,13 +104,13 @@ class BUACrawler:
         response = requests.post(self.__currentUrl, data=payload, headers=header)
         self.currentPage = response.content
         pagesIndex = self.__catalogLastPageIndex()
+        books = self.__extractBooksOfCurrentPage()
         numPages = 1
         if len(pagesIndex) == 2:
             numPages = pagesIndex[1]/20 + 1
         return [books, numPages, pagesIndex]
 
     def nextPageOfCatalog(self, indexPagination):
-        booksData = []
         action = self.__getActionOfForm(nameHitlistForm)
         self.__currentUrl = urlBase + action
         payload = {'first_hit': indexPagination[0],
@@ -99,12 +119,9 @@ class BUACrawler:
         response = requests.post(self.__currentUrl, data=payload,
                 headers=header)
         self.currentPage = response.content
-        ##TODO #booksData = extractBooksOfCurrentPage()
-
-        return booksData
+        return self.__extractBooksOfCurrentPage()
 
     def lastPageOfCatalog(self, indexPagination):
-        booksData = []
         action = self.__getActionOfForm(nameHitlistForm)
         self.__currentUrl = urlBase + action
         payload = {'first_hit': indexPagination[0],
@@ -113,9 +130,7 @@ class BUACrawler:
         response = requests.post(self.__currentUrl, data=payload,
                 headers=header)
         self.currentPage = response.content
-        
-        ##TODO #booksData = extractBooksOfCurrentPage()
-        return booksData
+        return self.__extractBooksOfCurrentPage()
 
     def showLoans(self):
 

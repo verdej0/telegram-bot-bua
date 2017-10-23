@@ -4,7 +4,7 @@
 ##TODO: Improve the next two lines
 
 import sys
-sys.path.append('Crawler/')
+sys.path.append('__crawler/')
 sys.path.append('Model/Exceptions/')
 
 from BUACrawler import BUACrawler
@@ -17,46 +17,46 @@ from CatalogException import NoSearchException, OnlyOnePageException, BookIndexO
 class BUA:
 
     def __init__(self):
-        self.crawler = BUACrawler()
-        self.catalog = BUACatalog()
+        self.__crawler = BUACrawler()
+        self.__catalog = BUACatalog()
         self.__loansBooks = BUALoanBooks()
 
         self.__isOnCatalog = False
-        self.isLogged = False
+        self.__isLogged = False
         self.__isRenovatingBooks = False
 
     def login(self, user, secret):
-        if not self.isLogged:
-            self.isLogged = self.crawler.login(user, secret)
-            if not self.isLogged:
+        if not self.__isLogged:
+            self.__isLogged = self.__crawler.login(user, secret)
+            if not self.__isLogged:
                 raise InvalidCredentialsException()
         else:
             raise AlreadyLoggedUserException()
 
     def disconnect(self):
-        if not self.isLogged:
+        if not self.__isLogged:
             raise UnloggedUserException()
 
-        self.crawler.disconnect()    
-        self.isLogged = True
+        self.__crawler.disconnect()    
+        self.__isLogged = True
         self.__isOnCatalog = False
         self.__isRenovatingBooks = False
     
 
     def showLoans(self):
         self.__isOnCatalog = False
-        self.catalog.clean()
+        self.__catalog.clean()
         self.__loansBooks.clean()
-        if not self.isLogged:
+        if not self.__isLogged:
             raise UnloggedUserException()
 
         self.__isRenovatingBooks = True
-        self.__loansBooks.setBooks(self.crawler.showLoans())
+        self.__loansBooks.setBooks(self.__crawler.showLoans())
         return self.__loansBooks.books
 
     def loanSelectedBooks(self, selectedBooks):
 
-        if not self.isLogged:
+        if not self.__isLogged:
             raise UnloggedUserException()
 
         # #TODO
@@ -65,7 +65,7 @@ class BUA:
 
     def loanAllBooks(self):
 
-        if not self.isLogged:
+        if not self.__isLogged:
             raise UnloggedUserException()
 
         # #TODO
@@ -73,29 +73,29 @@ class BUA:
         print 'loanAllBooks'
 
     def searchBook(self, name):
-        self.catalog.clean()
+        self.__catalog.clean()
         self.__loansBooks.clean()
         self.__isRenovatingBooks = False
-        dataForBookSearched = self.crawler.searchBook(name)
-        self.catalog.setBooks(dataForBookSearched[0])
-        self.catalog.page = 1
-        self.catalog.numPages = dataForBookSearched[1]
-        self.catalog.pageIndexs = dataForBookSearched[2]
+        dataForBookSearched = self.__crawler.searchBook(name)
+        self.__catalog.setBooks(dataForBookSearched[0])
+        self.__catalog.page = 1
+        self.__catalog.numPages = dataForBookSearched[1]
+        self.__catalog.pageIndexs = dataForBookSearched[2]
         self.__isOnCatalog = True
-        return self.catalog.books
+        return self.__catalog.books
 
     def stepBackward(self):
-        self.crawler.stepBackward()
+        self.__crawler.stepBackward()
 
     def localizationsForBook(self, idBook:
         if not self.__isOnCatalog:
             raise NoSearchException()
         
-        if idBook<0 or idBook>=len(self.catalog.books):
+        if idBook<0 or idBook>=len(self.__catalog.books):
             raise BookIndexOutbound()
 
-        viewId = self.catalog.books[idBook].viewAction
-        locations = self.crawler.localizationsForBook(viewId, self.catalog.page)
+        viewId = self.__catalog.books[idBook].viewAction
+        locations = self.__crawler.localizationsForBook(viewId, self.__catalog.page)
         self.stepBackward()
         return locations
 
@@ -103,14 +103,14 @@ class BUA:
         if not self.__isOnCatalog:
             raise NoSearchException()
         
-        if self.catalog.numPages==1:
+        if self.__catalog.numPages==1:
             raise OnlyOnePageException()
 
-        if self.catalog.page < self.catalog.numPages:
-            self.catalog.page += 1
-            self.catalog.setBooks(self.crawler.nextPageOfCatalog(self.catalog.pageIndexs))
+        if self.__catalog.page < self.__catalog.numPages:
+            self.__catalog.page += 1
+            self.__catalog.setBooks(self.__crawler.nextPageOf__catalog(self.__catalog.pageIndexs))
 
-        return self.catalog.books
+        return self.__catalog.books
         
 
     def lastPage(self):
@@ -118,10 +118,10 @@ class BUA:
         if not self.__isOnCatalog:
             raise NoSearchException()
 
-        if self.catalog.numPages==1:
+        if self.__catalog.numPages==1:
             raise OnlyOnePageException()
         
-        if self.catalog.page > 1:
-            self.catalog.page -= 1
-            self.catalog.setBooks(self.crawler.nextPageOfCatalog(self.catalog.pageIndexs))
-        return self.catalog.books
+        if self.__catalog.page > 1:
+            self.__catalog.page -= 1
+            self.__catalog.setBooks(self.__crawler.nextPageOf__catalog(self.__catalog.pageIndexs))
+        return self.__catalog.books

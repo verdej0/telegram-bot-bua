@@ -16,11 +16,11 @@ from CatalogException import NoSearchException, OnlyOnePageException, BookIndexO
 class BUABot:
 
     def __init__(self):
-        self.bua = BUA()
+        self.__bua = BUA()
         
     def login(self, user, secret):
         try:
-            self.bua.login(user, secret)
+            self.__bua.login(user, secret)
             print 'Login sucessful'
         except InvalidCredentialsException:
             print 'InvalidCredentialsException'
@@ -29,19 +29,19 @@ class BUABot:
 
     def disconnect(self):
         try:
-            self.bua.disconnect()
+            self.__bua.disconnect()
             print 'Disconnect sucessful'
         except UnloggedUserException:
             print 'UnloggedUserException'
 
     def showLoans(self):
         try:
-            print self.bua.showLoans()
+            print self.__bua.showLoans()
         except UnloggedUserException:
             print 'UnloggedUserException'
 
     def searchBook(self, name):
-            books = self.bua.searchBook(name)
+            books = self.__bua.searchBook(name)
             if len(books)==0:
                 print 'No books found'
             else:
@@ -49,7 +49,7 @@ class BUABot:
 
     def localizationForBook(self, idBook):
         try:
-            locations = self.bua.localizationsForBook(idBook)
+            locations = self.__bua.localizationsForBook(idBook)
             print locations
         except NoSearchException:
             print 'NoSearchException'
@@ -58,7 +58,7 @@ class BUABot:
 
     def nextPage(self):
         try:
-            books = self.bua.nextPage()
+            books = self.__bua.nextPage()
             print books
         except NoSearchException:
             print 'NoSearchException'
@@ -67,7 +67,7 @@ class BUABot:
 
     def lastPage(self):
         try:
-            books = self.bua.lastPage()
+            books = self.__bua.lastPage()
             print books
         except NoSearchException:
             print 'NoSearchException'
@@ -77,12 +77,12 @@ class BUABot:
     def loanSelectedBooks(self, selectedBooks):
         ##Check if the indexs of selected books are correct
         try:
-            print self.bua.loanSelectedBooks(selectedBooks)
+            print self.__bua.loanSelectedBooks(selectedBooks)
         except UnloggedUserException:
             print 'UnloggedUserException'
 
     def loanAllBooks(self):
         try:
-            print self.bua.loanAllBooks()
+            print self.__bua.loanAllBooks()
         except UnloggedUserException:
             print 'UnloggedUserException'

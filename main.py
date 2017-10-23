@@ -15,6 +15,11 @@ secret = 'YYYY'
 
 def main():
     buaBot = BUABot()
+    buaBot.searchBook('computacion')
+    buaBot.nextPage()
+    buaBot.localizationForBook(0)
+    buaBot.lastPage()
+    buaBot.localizationForBook(0)
     buaBot.login(username, secret)
     buaBot.showLoans()
 

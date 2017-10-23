@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-class Book:
+class LoanBook:
 
     def __init__(self, data):
         
@@ -22,9 +22,9 @@ class Book:
         if not self.title == '':
             info += self.title
         if not self.author == '':
-            info += '|' + self.author
+            info += ' | ' + self.author
         if not self.returnDate == '':
-            info += '|' + self.returnDate
+            info += ' | ' + self.returnDate
         return info
 
     def __str__(self):

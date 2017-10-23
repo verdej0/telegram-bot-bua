@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-from Book import Book
+from LoanBook import LoanBook
 
 
 class BUALoanBooks:
@@ -15,4 +15,4 @@ class BUALoanBooks:
 
     def setBooks(self, dataBooks):
         for book in dataBooks:
-            self.books.append(Book(book))
+            self.books.append(LoanBook(book))

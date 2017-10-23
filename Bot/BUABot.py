@@ -47,6 +47,18 @@ class BUABot:
             else:
                 print books
 
+    def localizationForBook(self, idBook):
+        if idBook<0 or idBook>=len(self.bua.catalog.books):
+            return
+
+        bookViewAction = self.bua.catalog.books[idBook].viewAction
+        try:
+            locations = self.bua.localizationsForBook(bookViewAction)
+            print locations
+        except NoSearchException:
+            print 'NoSearchException'
+
+
 
     def nextPage(self):
         try:

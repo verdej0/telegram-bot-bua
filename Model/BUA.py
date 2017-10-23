@@ -76,13 +76,23 @@ class BUA:
         self.catalog.clean()
         self.__loansBooks.clean()
         self.__isRenovatingBooks = False
-        dataForBookSearched = self.crawler.searchBooks(name)
+        dataForBookSearched = self.crawler.searchBook(name)
         self.catalog.setBooks(dataForBookSearched[0])
         self.catalog.page = 1
         self.catalog.numPages = dataForBookSearched[1]
         self.catalog.pageIndexs = dataForBookSearched[2]
         self.__isOnCatalog = True
         return self.catalog.books
+
+    def stepBackward(self):
+        self.crawler.stepBackward()
+
+    def localizationsForBook(self, viewId):
+        if not self.__isOnCatalog:
+            raise NoSearchException()
+        locations = self.crawler.localizationsForBook(viewId, self.catalog.page)
+        self.stepBackward()
+        return locations
 
     def nextPage(self):
         if not self.__isOnCatalog:

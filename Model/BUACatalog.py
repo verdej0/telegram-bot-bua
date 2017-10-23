@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-from Book import Book
+from CatalogBook import CatalogBook
 
 
 class BUACatalog:
@@ -19,4 +19,4 @@ class BUACatalog:
     def setBooks(self, dataBooks):
         self.books = []
         for book in dataBooks:
-            self.books.append(Book(book))
+            self.books.append(CatalogBook(book))

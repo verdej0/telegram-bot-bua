@@ -52,7 +52,7 @@ class BUACrawler:
 
         return bookSearchPages
 
-    def __extractBooksOf__currentPage(self):
+    def __extractBooksOfCurrentPage(self):
         self.__urlScrapped = bs(self.__currentPage, 'html.parser')
         setOfTables = self.__urlScrapped.find_all('td', {'class': 'searchsum'})
         
@@ -70,9 +70,15 @@ class BUACrawler:
                 books.append(match.groups())   
 
         return books
-        
 
-    def searchBooks(self, bookName):
+    def stepBackward(self):
+        self.__urlScrapped = bs(self.__currentPage, 'html.parser')
+        tables = self.__urlScrapped.find('table', {'class', 'gatewaystyle'})
+        action = tables.find('tr').find('td').find_all('a')[0].attrs.get('href')
+        self.__currentUrl = urlBase + action
+        self.__currentPage = requests.get(self.__currentUrl).content
+
+    def searchBook(self, bookName):
 
         ## Go to catalog menu section
         books = []
@@ -102,11 +108,58 @@ class BUACrawler:
         response = requests.post(self.__currentUrl, data=payload, headers=header)
         self.__currentPage = response.content
         pagesIndex = self.__catalogLastPageIndex()
-        books = self.__extractBooksOf__currentPage()
+        books = self.__extractBooksOfCurrentPage()
         numPages = 1
         if len(pagesIndex) == 2:
             numPages = pagesIndex[1]/20 + 1
         return [books, numPages, pagesIndex]
+
+    def localizationsForBook(self, viewName, currentPage):
+        
+        locations = []
+        last_hit =  currentPage * 20
+        first_hit = last_hit - 19
+
+        action = self.__getActionOfForm(nameHitlistForm)
+        self.__currentUrl = urlBase + action
+        payload = {'first_hit': first_hit,
+                    'last_hit': last_hit,
+                    'form_type': '',
+                    viewName: 'Detalles'}
+
+        response = requests.post(self.__currentUrl, data=payload, headers=header)
+        self.__currentPage = response.content
+        self.__urlScrapped = bs(self.__currentPage, 'html.parser')
+        
+        panel1 = self.__urlScrapped.find('div', {'id':'panel1'})
+
+        tables = panel1.find_all('table')
+        if len(tables) < 2:
+            return locations
+
+
+        trSet = tables[1].find_all('tr')
+        if len(tables) == 0:
+            return locations
+
+        for index in range(2, len(trSet)):
+            tdSet = trSet[index].find_all('td')
+
+            signature = ''
+            location = ''
+            if len(tdSet)>1:
+                signature = tdSet[0].next.lstrip()
+            if len(tdSet)==4:
+                location = tdSet[3].next.lstrip()
+
+            if signature == '' and len(locations)>0:
+                signature = locations[len(locations)-1][0]
+            locations.append([signature, location])
+            
+        return locations
+
+        
+        
 
     def nextPageOfCatalog(self, indexPagination):
         action = self.__getActionOfForm(nameHitlistForm)
@@ -117,7 +170,7 @@ class BUACrawler:
         response = requests.post(self.__currentUrl, data=payload,
                 headers=header)
         self.__currentPage = response.content
-        return self.__extractBooksOf__currentPage()
+        return self.__extractBooksOfCurrentPage()
 
     def lastPageOfCatalog(self, indexPagination):
         action = self.__getActionOfForm(nameHitlistForm)
@@ -128,7 +181,7 @@ class BUACrawler:
         response = requests.post(self.__currentUrl, data=payload,
                 headers=header)
         self.__currentPage = response.content
-        return self.__extractBooksOf__currentPage()
+        return self.__extractBooksOfCurrentPage()
 
     def showLoans(self):
 

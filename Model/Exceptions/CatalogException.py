@@ -7,3 +7,6 @@ class NoSearchException(Exception):
 
 class OnlyOnePageException(Exception):
     pass
+
+class BookIndexOutbound(Exception):
+    pass

@@ -11,7 +11,7 @@ from BUACrawler import BUACrawler
 from BUALoanBooks import BUALoanBooks
 from BUACatalog import BUACatalog
 from LoginException import InvalidCredentialsException, UnloggedUserException, AlreadyLoggedUserException
-from CatalogException import NoSearchException, OnlyOnePageException
+from CatalogException import NoSearchException, OnlyOnePageException, BookIndexOutbound
 
 
 class BUA:
@@ -87,9 +87,14 @@ class BUA:
     def stepBackward(self):
         self.crawler.stepBackward()
 
-    def localizationsForBook(self, viewId):
+    def localizationsForBook(self, idBook:
         if not self.__isOnCatalog:
             raise NoSearchException()
+        
+        if idBook<0 or idBook>=len(self.catalog.books):
+            raise BookIndexOutbound()
+
+        viewId = self.catalog.books[idBook].viewAction
         locations = self.crawler.localizationsForBook(viewId, self.catalog.page)
         self.stepBackward()
         return locations

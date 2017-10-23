@@ -219,7 +219,7 @@ class BUACrawler:
         matches = re.finditer(Utils.regex, self.__currentPage)
         for match in matches:
             books.append(match.groups())
-
+        
         return books
 
     def loanSelectedBook(self):

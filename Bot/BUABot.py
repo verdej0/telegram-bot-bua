@@ -9,7 +9,7 @@ sys.path.append("Model/")
 
 from BUA import BUA
 from LoginException import InvalidCredentialsException, UnloggedUserException, AlreadyLoggedUserException
-from CatalogException import NoSearchException, OnlyOnePageException
+from CatalogException import NoSearchException, OnlyOnePageException, BookIndexOutbound
 
 
 ##TODO: Add timeout for disconnect, for example, 15min...
@@ -48,17 +48,13 @@ class BUABot:
                 print books
 
     def localizationForBook(self, idBook):
-        if idBook<0 or idBook>=len(self.bua.catalog.books):
-            return
-
-        bookViewAction = self.bua.catalog.books[idBook].viewAction
         try:
-            locations = self.bua.localizationsForBook(bookViewAction)
+            locations = self.bua.localizationsForBook(idBook)
             print locations
         except NoSearchException:
             print 'NoSearchException'
-
-
+        except BookIndexOutbound:
+            print 'BookIndexOutbound'
 
     def nextPage(self):
         try:

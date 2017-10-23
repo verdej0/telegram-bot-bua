@@ -9,9 +9,10 @@
 - Desconectarse
 - Ver libros para renovar
 - Extraer array [[titulo,autor], [titulo,autor], …] de libros buscados
+- Comprobar si login correcto
 
 ## TODO:
 
 - Post para reservar libros seleccionados
 - Post para reservar todos los libros
-- Comprobar si login correcto
+

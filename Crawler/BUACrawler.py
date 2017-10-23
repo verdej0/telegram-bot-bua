@@ -22,14 +22,12 @@ firstAction = '/uhtbin/cgisirsi/x/x/0/49/'
 class BUACrawler:
 
     def __init__(self):
-        urlBua = urlBase + firstAction
-        self.currentPage = requests.get(urlBua).content
+        self.__currentUrl = urlBase + firstAction
+        self.__currentPage = requests.get(self.__currentUrl).content
         self.__urlScrapped = None
-        self.__currentUrl = ''
-        self.__isLogged = False
 
     def __getActionOfForm(self, formName):
-        self.__urlScrapped = bs(self.currentPage, 'html.parser')
+        self.__urlScrapped = bs(self.__currentPage, 'html.parser')
         forms = self.__urlScrapped.find_all('form')
         action = ''
         for form in forms:
@@ -39,7 +37,7 @@ class BUACrawler:
         return action
 
     def __catalogLastPageIndex(self):
-        self.__urlScrapped = bs(self.currentPage, 'html.parser')
+        self.__urlScrapped = bs(self.__currentPage, 'html.parser')
         setOfP = self.__urlScrapped.find_all('p', {'class': 'searchsum'})
         bookSearchPages = []
         for p in setOfP:
@@ -54,8 +52,8 @@ class BUACrawler:
 
         return bookSearchPages
 
-    def __extractBooksOfCurrentPage(self):
-        self.__urlScrapped = bs(self.currentPage, 'html.parser')
+    def __extractBooksOf__currentPage(self):
+        self.__urlScrapped = bs(self.__currentPage, 'html.parser')
         setOfTables = self.__urlScrapped.find_all('td', {'class': 'searchsum'})
         
         books = []
@@ -78,7 +76,7 @@ class BUACrawler:
 
         ## Go to catalog menu section
         books = []
-        self.__urlScrapped = bs(self.currentPage, 'html.parser')
+        self.__urlScrapped = bs(self.__currentPage, 'html.parser')
         setOfTd = self.__urlScrapped.find_all('td', {'class': 'rootbarcell'})
         action = ''
         for td in setOfTd:
@@ -90,7 +88,7 @@ class BUACrawler:
             return books
 
         self.__currentUrl = urlBase + action
-        self.currentPage = requests.get(self.__currentUrl).content
+        self.__currentPage = requests.get(self.__currentUrl).content
 
         action = self.__getActionOfForm(nameSearchForm)
         self.__currentUrl = urlBase + action
@@ -102,9 +100,9 @@ class BUACrawler:
             'sort_by': 'TI',
             }
         response = requests.post(self.__currentUrl, data=payload, headers=header)
-        self.currentPage = response.content
+        self.__currentPage = response.content
         pagesIndex = self.__catalogLastPageIndex()
-        books = self.__extractBooksOfCurrentPage()
+        books = self.__extractBooksOf__currentPage()
         numPages = 1
         if len(pagesIndex) == 2:
             numPages = pagesIndex[1]/20 + 1
@@ -118,8 +116,8 @@ class BUACrawler:
                     'form_type': 'SCROLL^F'}
         response = requests.post(self.__currentUrl, data=payload,
                 headers=header)
-        self.currentPage = response.content
-        return self.__extractBooksOfCurrentPage()
+        self.__currentPage = response.content
+        return self.__extractBooksOf__currentPage()
 
     def lastPageOfCatalog(self, indexPagination):
         action = self.__getActionOfForm(nameHitlistForm)
@@ -129,14 +127,14 @@ class BUACrawler:
                     'form_type': 'SCROLL^B'}
         response = requests.post(self.__currentUrl, data=payload,
                 headers=header)
-        self.currentPage = response.content
-        return self.__extractBooksOfCurrentPage()
+        self.__currentPage = response.content
+        return self.__extractBooksOf__currentPage()
 
     def showLoans(self):
 
         # This enters in link 'Servios al usuario'
         books = []
-        self.__urlScrapped = bs(self.currentPage, 'html.parser')
+        self.__urlScrapped = bs(self.__currentPage, 'html.parser')
         setOfTd = self.__urlScrapped.find_all('td', {'class': 'rootbarcell'})
         action = ''
         for td in setOfTd:
@@ -148,10 +146,10 @@ class BUACrawler:
             return books
 
         self.__currentUrl = urlBase + action
-        self.currentPage = requests.get(self.__currentUrl).content
+        self.__currentPage = requests.get(self.__currentUrl).content
 
         # This enters in link 'Renovar Prestamos'
-        self.__urlScrapped = bs(self.currentPage, 'html.parser')
+        self.__urlScrapped = bs(self.__currentPage, 'html.parser')
         tables = self.__urlScrapped.find_all('table',
                 {'class': 'defaultstyle'})
         action = tables[0].find_all('a')[-1].attrs.get('href')
@@ -160,12 +158,12 @@ class BUACrawler:
             return books
 
         self.__currentUrl = urlBase + action
-        self.currentPage = requests.get(self.__currentUrl).content
+        self.__currentPage = requests.get(self.__currentUrl).content
 
         # Now, we're on loan page
         ##DELETE: Remove this line for production
-        self.currentPage = Utils.testPage
-        matches = re.finditer(Utils.regex, self.currentPage)
+        self.__currentPage = Utils.testPage
+        matches = re.finditer(Utils.regex, self.__currentPage)
         for match in matches:
             books.append(match.groups())
 
@@ -184,22 +182,21 @@ class BUACrawler:
         self.__currentUrl = urlBase + action
         payload = {'user_id': user, 'password': secret}
         response = requests.post(self.__currentUrl, data=payload, headers=header)
-        self.currentPage = response.content
+        self.__currentPage = response.content
 
-        ##TODO: Check if login is failed return False
-        # if response.status == 200:
-        #   self.isLogged = True
-
+        self.__urlScrapped = bs(self.__currentPage, 'html.parser')
+        if self.__urlScrapped.find('div', {'class': 'pagecontainer3pg'}) == None:
+            return False
         return True
 
     def disconnect(self):
-        self.__urlScrapped = bs(self.currentPage, 'html.parser')
+        self.__urlScrapped = bs(self.__currentPage, 'html.parser')
         tables = self.__urlScrapped.find_all('table', {'class': 'gatewaystyle'})
         action = tables[0].find_all('a')[-1].attrs.get('href')
         self.__currentUrl = urlBase + action
-        self.currentPage = requests.post(self.__currentUrl).content
+        self.__currentPage = requests.post(self.__currentUrl).content
         
         self.__isLogged = False
         self.__urlScrapped = None
         self.__currentUrl = urlBase + firstAction
-        self.currentPage = requests.get(self.__currentUrl).content
+        self.__currentPage = requests.get(self.__currentUrl).content

@@ -195,8 +195,6 @@ class BUACrawler:
         action = tables[0].find_all('a')[-1].attrs.get('href')
         self.__currentUrl = urlBase + action
         self.__currentPage = requests.post(self.__currentUrl).content
-        
-        self.__isLogged = False
         self.__urlScrapped = None
         self.__currentUrl = urlBase + firstAction
         self.__currentPage = requests.get(self.__currentUrl).content

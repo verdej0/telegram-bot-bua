@@ -15,6 +15,6 @@
 
 ## TODO:
 
-- Post para reservar libros seleccionados
-- Post para reservar todos los libros
+- Post para renovar libros seleccionados
+- Post para renovar todos los libros
 

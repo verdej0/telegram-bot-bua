@@ -86,3 +86,6 @@ class BUABot:
             print self.__bua.loanAllBooks()
         except UnloggedUserException:
             print 'UnloggedUserException'
+
+
+

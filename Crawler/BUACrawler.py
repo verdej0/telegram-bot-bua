@@ -15,6 +15,7 @@ header = {'content-type': 'application/x-www-form-urlencoded'}
 nameSearchForm = 'searchform'
 nameNewSessionForm = 'loginform'
 nameHitlistForm = 'hitlist'
+nameRenewBooksForm = 'renewitems'
 urlBase = 'http://gaudi.ua.es'
 firstAction = '/uhtbin/cgisirsi/x/x/0/49/'
 
@@ -158,9 +159,6 @@ class BUACrawler:
             
         return locations
 
-        
-        
-
     def nextPageOfCatalog(self, indexPagination):
         action = self.__getActionOfForm(nameHitlistForm)
         self.__currentUrl = urlBase + action
@@ -212,23 +210,18 @@ class BUACrawler:
 
         self.__currentUrl = urlBase + action
         self.__currentPage = requests.get(self.__currentUrl).content
-
-        # Now, we're on loan page
-        ##DELETE: Remove this line for production
-        self.__currentPage = Utils.testPage
         matches = re.finditer(Utils.regex, self.__currentPage)
         for match in matches:
             books.append(match.groups())
         
         return books
 
-    def loanSelectedBook(self):
-        ##TODO
-        pass
-
-    def loanAllBooks(self):
-        ##TODO
-        pass
+    def loanAllBooks(self, userId):
+        action = self.__getActionOfForm(nameRenewBooksForm)
+        self.__currentUrl = urlBase + action
+        payload = {'user_id': userId, 'selection_type': 'all'}
+        self.__currentPage = requests.post(self.__currentUrl, data=payload, headers=header).content
+        
 
     def login(self, user, secret):
         action = self.__getActionOfForm(nameNewSessionForm)

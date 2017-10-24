@@ -4,7 +4,7 @@
 ##TODO: Improve the next two lines
 
 import sys
-sys.path.append('__crawler/')
+sys.path.append('Crawler/')
 sys.path.append('Model/Exceptions/')
 
 from BUACrawler import BUACrawler
@@ -20,6 +20,7 @@ class BUA:
         self.__crawler = BUACrawler()
         self.__catalog = BUACatalog()
         self.__loansBooks = BUALoanBooks()
+        self.__userId = ''
 
         self.__isOnCatalog = False
         self.__isLogged = False
@@ -30,6 +31,7 @@ class BUA:
             self.__isLogged = self.__crawler.login(user, secret)
             if not self.__isLogged:
                 raise InvalidCredentialsException()
+            self.__userId = user
         else:
             raise AlreadyLoggedUserException()
 
@@ -54,23 +56,13 @@ class BUA:
         self.__loansBooks.setBooks(self.__crawler.showLoans())
         return self.__loansBooks.books
 
-    def loanSelectedBooks(self, selectedBooks):
-
-        if not self.__isLogged:
-            raise UnloggedUserException()
-
-        # #TODO
-
-        print 'loanSelectedBooks'
-
     def loanAllBooks(self):
 
         if not self.__isLogged:
             raise UnloggedUserException()
 
-        # #TODO
-
-        print 'loanAllBooks'
+        self.__crawler.loanAllBooks(self.__userId)
+        return self.showLoans()
 
     def searchBook(self, name):
         self.__catalog.clean()
@@ -87,7 +79,7 @@ class BUA:
     def stepBackward(self):
         self.__crawler.stepBackward()
 
-    def localizationsForBook(self, idBook:
+    def localizationsForBook(self, idBook):
         if not self.__isOnCatalog:
             raise NoSearchException()
         

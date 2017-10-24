@@ -12,9 +12,6 @@
 - Comprobar si login correcto
 - Obtener localizaciones de un libro buscado.
 - Retrodecer (aparece en un menu pequeño en la pagina de BUA, es para volver sin perder la sesión)
-
-## TODO:
-
-- Post para renovar libros seleccionados
 - Post para renovar todos los libros
+
 

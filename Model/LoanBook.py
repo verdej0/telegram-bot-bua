@@ -9,6 +9,7 @@ class LoanBook:
         self.title = ''
         self.author = ''
         self.returnDate = ''
+        self.selector = ''
 
         if len(data) > 0:
             self.title = data[0]

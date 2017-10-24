@@ -210,7 +210,7 @@ class BUACrawler:
 
         self.__currentUrl = urlBase + action
         self.__currentPage = requests.get(self.__currentUrl).content
-        matches = re.finditer(Utils.regex, self.__currentPage)
+        matches = re.finditer(Utils.loanBooksRegex, self.__currentPage)
         for match in matches:
             books.append(match.groups())
         

@@ -22,6 +22,7 @@ def main():
     buaBot.localizationForBook(0)
     buaBot.login(username, secret)
     buaBot.showLoans()
+    buaBot.loanAllBooks()
 
 
 if __name__ == '__main__':

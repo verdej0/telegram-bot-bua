@@ -74,13 +74,6 @@ class BUABot:
         except OnlyOnePageException:
             print 'OnlyOnePageException'
 
-    def loanSelectedBooks(self, selectedBooks):
-        ##Check if the indexs of selected books are correct
-        try:
-            print self.__bua.loanSelectedBooks(selectedBooks)
-        except UnloggedUserException:
-            print 'UnloggedUserException'
-
     def loanAllBooks(self):
         try:
             print self.__bua.loanAllBooks()

@@ -21,7 +21,6 @@ class BUABot:
         
     def login(self, user, secret):
         text=''
-        print('TUPUTAMADRE')
         try:
             self.__bua.login(user, secret)
             text+= 'Login sucessful'
